@@ -1,22 +1,37 @@
+
 spring:
   application:
     name: spring-security
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    # Provide database platform that is being used
     hibernate:
+      # New database is created when application starts and destroyed when application is stopped
       ddl-auto: create-drop
+    # Show sql when spring data jpa performs query
     show-sql: true
     properties:
       hibernate:
+        # Format queries
         format_sql: true
   datasource:
-    url: jdbc:h2:mem:spring-security
-    driver-class-name: org.h2.Driver
-    username: root
-    password: 12345
-  h2:
-    console:
-      enabled: true
+
+    url: jdbc:mysql://localhost:3306/employee_directory
+    username: springstudent
+    password: springstudent
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hakan.ari55555@gmail.com
+    password:  Ahmet369212.
+
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
 token:
   signing:
     key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351

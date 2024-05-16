@@ -1,10 +1,9 @@
 package com.taxi.backend.controller;
 
+import com.taxi.backend.dao.model.RequestChangePassword;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.web.bind.annotation.*;
 
 import com.taxi.backend.dao.request.SignUpRequest;
 import com.taxi.backend.dao.request.SigninRequest;
@@ -18,13 +17,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    @PostMapping("/signup")
-    public ResponseEntity<JwtAuthenticationResponse> signup(@RequestBody SignUpRequest request) {
-        return ResponseEntity.ok(authenticationService.signup(request));
+    @PostMapping("/sign/signup")
+    public ResponseEntity<SimpleMailMessage> signup(@RequestBody SignUpRequest request) {
+        return authenticationService.signup(request);
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/sign/signin")
     public ResponseEntity<JwtAuthenticationResponse> signin(@RequestBody SigninRequest request) {
         return ResponseEntity.ok(authenticationService.signin(request));
+    }
+    @PostMapping("/changeuserpassword")
+    public ResponseEntity<String> ChangeUserPassword(@RequestBody RequestChangePassword request) {
+        return ResponseEntity.ok(authenticationService.changeUserPassword(request));
+    }
+    @RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<?> confirmUserAccount(@RequestParam("token")String confirmationToken) {
+        return authenticationService.confirmEmail(confirmationToken);
     }
 }
