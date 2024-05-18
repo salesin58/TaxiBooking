@@ -31,19 +31,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void send(String to, String email) {
-        try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-
-            helper.setText(email, true);
-            helper.setTo(to);
-            helper.setSubject("Confirm your email");
-            helper.setFrom("hello@akechsalim.com");
-        } catch (MessagingException e) {
-            LOGGER.error("Failed to send email", e);
-            throw new IllegalStateException("Failed to send email");
-        }
-
+    public void sendEmail(SimpleMailMessage email) {
+        mailSender.send(email);
     }
 }

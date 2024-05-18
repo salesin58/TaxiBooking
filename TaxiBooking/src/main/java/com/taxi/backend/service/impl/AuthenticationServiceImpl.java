@@ -36,9 +36,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final CustomerService customerService;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final EmailService emailService;
-    private final CustomerService customerService;
+
     @Override
     public ResponseEntity<SimpleMailMessage> signup(SignUpRequest request) {
         var user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())

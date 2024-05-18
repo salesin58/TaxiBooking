@@ -4,7 +4,6 @@ import com.taxi.backend.entities.Customer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.io.UnsupportedEncodingException;
 
 public interface CustomerService {
     Customer save(Customer customer) ;

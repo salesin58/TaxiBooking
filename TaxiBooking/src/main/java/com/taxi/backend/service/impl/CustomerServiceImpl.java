@@ -3,13 +3,12 @@ package com.taxi.backend.service.impl;
 import com.taxi.backend.entities.Customer;
 import com.taxi.backend.repository.CustomerRepository;
 import com.taxi.backend.service.CustomerService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
-
+@Service
 public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
     @Override
