@@ -2,13 +2,11 @@ package com.taxi.backend.service.impl;
 
 import com.taxi.backend.dao.model.RequestChangePassword;
 import com.taxi.backend.entities.ConfirmationToken;
+import com.taxi.backend.entities.Customer;
 import com.taxi.backend.entities.Role;
 import com.taxi.backend.repository.ConfirmationTokenRepository;
 import com.taxi.backend.repository.UserRepository;
-import com.taxi.backend.service.AuthenticationService;
-import com.taxi.backend.service.EmailService;
-import com.taxi.backend.service.JwtService;
-import com.taxi.backend.service.UserService;
+import com.taxi.backend.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,6 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserService userService;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final EmailService emailService;
+    private final CustomerService customerService;
     @Override
     public ResponseEntity<SimpleMailMessage> signup(SignUpRequest request) {
         var user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
@@ -47,6 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.USER).build();
         userRepository.save(user);
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
+
 
         confirmationTokenRepository.save(confirmationToken);
 
@@ -101,7 +101,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         {
             User user = userRepository.findByEmailIgnoreCase(token.getUser().getEmail());
             user.setIsEnabled(true);
-            userRepository.save(user);
+
+
+           userRepository.save(user);
+            var customer=customerService.save(Customer.builder().user(user).build());
             return ResponseEntity.ok("Email verified successfully!");
         }
         return ResponseEntity.badRequest().body("Error: Couldn't verify email");

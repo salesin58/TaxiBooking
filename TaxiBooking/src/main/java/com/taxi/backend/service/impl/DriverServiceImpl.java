@@ -139,7 +139,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<Driver> findAvailableDriver(String city,DriverApprovalStatus Status) {
-        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(city,Status);
+    public List<Driver> findAvailableDriver(String city,DriverApprovalStatus Status,String vehicleType) {
+        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(city,Status,vehicleType);
     }
 }

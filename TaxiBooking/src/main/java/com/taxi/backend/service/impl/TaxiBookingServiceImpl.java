@@ -9,6 +9,7 @@ import com.taxi.backend.repository.DriverRepository;
 import com.taxi.backend.repository.TaxiBookingRepository;
 import com.taxi.backend.service.CalculationService;
 import com.taxi.backend.service.DriverService;
+import com.taxi.backend.service.IVehicleTypeService;
 import com.taxi.backend.service.TaxiBookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,24 +24,27 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
     private final DriverRepository driverRepository;
     private final CalculationService calculationService;
     private final DriverService driverService;
+    private final IVehicleTypeService vehicleTypeService;
 
-    public TaxiBookingServiceImpl(CustomerRepository customerRepository, TaxiBookingRepository taxiBookingRepository, DriverRepository driverRepository, CalculationService calculationService, DriverService driverService) {
+    public TaxiBookingServiceImpl(CustomerRepository customerRepository, TaxiBookingRepository taxiBookingRepository, DriverRepository driverRepository, CalculationService calculationService, DriverService driverService, IVehicleTypeService vehicleTypeService) {
         this.customerRepository = customerRepository;
         this.taxiBookingRepository = taxiBookingRepository;
         this.driverRepository = driverRepository;
         this.calculationService = calculationService;
         this.driverService = driverService;
+        this.vehicleTypeService = vehicleTypeService;
     }
 
     @Override
     public TaxiBooking AddTrip(TaxiBookingCreateRequest tb) {
         List<Location> route = List.of(tb.getToLocation(), tb.getFromLocation())    ;
         var findCustomer=customerRepository.findById(tb.getCustomerId());
+        var findVehicleTypeByname=vehicleTypeService.findByName(tb.getVehicleType());
         var findCustom=findCustomer.get();
         Date now = new Date();
         var taxiBooking = TaxiBooking.builder().route(route).customer(findCustom).startTime(now)
                 .totalDistanceMeters(tb.getTotalDistanceMeters()).customer(findCustom)
-                .TaxibookingStatus(TaxiBookingStatus.SCHEDULE).city(tb.getCity()).build();
+                .TaxibookingStatus(TaxiBookingStatus.SCHEDULE).vehicleType(findVehicleTypeByname).city(tb.getCity()).build();
 
         return taxiBookingRepository.save(taxiBooking);
     }
@@ -56,7 +60,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
     }
     @Override
     public List<Driver> findSuitableDriver(TaxiBooking taxiBooking){
-        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(taxiBooking.getCity(), DriverApprovalStatus.APPROVED);
+        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(taxiBooking.getCity(), DriverApprovalStatus.APPROVED,taxiBooking.getVehicleType().getName());
     }
     @Override
     public List<DriverDistanceDTO> findcloseSuitableDriver(TaxiBooking taxiBooking){
@@ -80,6 +84,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
         var driver=driverService.findOne(driverId);
         taxibooking.setDriver(driver);
         taxibooking.setTaxibookingStatus(TaxiBookingStatus.CAB_DELIVERED);
+        driver.setIsAvailable(false);
         return taxiBookingRepository.save(taxibooking);
     }
 

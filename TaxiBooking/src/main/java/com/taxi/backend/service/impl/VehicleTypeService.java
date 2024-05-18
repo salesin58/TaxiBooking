@@ -1,6 +1,5 @@
 package com.taxi.backend.service.impl;
 
-import com.taxi.backend.entities.Location;
 import com.taxi.backend.entities.VehicleType;
 import com.taxi.backend.repository.VehicleTypeRepository;
 import com.taxi.backend.service.IVehicleTypeService;
@@ -39,6 +38,11 @@ public class VehicleTypeService implements IVehicleTypeService {
     public VehicleType save(VehicleType vehicleType) {
 
         return vehicleTypeRepository.save(vehicleType);
+    }
+    @Override
+    public VehicleType findByName(String name){
+
+        return vehicleTypeRepository.findByName(name);
     }
 
     @Override

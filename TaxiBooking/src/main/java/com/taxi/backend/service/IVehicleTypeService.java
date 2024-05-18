@@ -11,6 +11,8 @@ public interface IVehicleTypeService {
 
     VehicleType save(VehicleType vehicleType);
 
+    VehicleType findByName(String name);
+
     void deleteById(int theId);
     
 }

@@ -19,10 +19,13 @@ public class TaxiBooking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Integer id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
     private Driver driver;
+
+    @OneToOne(fetch =FetchType.EAGER)
+    private VehicleType vehicleType;
 
     @Enumerated(EnumType.STRING)
     private TaxiBookingStatus TaxibookingStatus;

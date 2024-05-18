@@ -16,5 +16,5 @@ public interface DriverService {
     Driver update(DriverUpdateDTO driverUpdateDTO);
     void deleteById(Integer id);
     Driver create(DriverRecordDTO driverRecordDTO);
-    List<Driver> findAvailableDriver(String city, DriverApprovalStatus status);
+    List<Driver> findAvailableDriver(String city, DriverApprovalStatus status,String vehicleType);
 }
