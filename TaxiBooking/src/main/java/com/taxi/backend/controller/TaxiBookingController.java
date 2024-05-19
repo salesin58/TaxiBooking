@@ -64,13 +64,13 @@ public class TaxiBookingController {
 
         return new ResponseEntity<>(taxiBookingService.deliverTaxiBooking(tb.getTaxiId(), tb.getDriverId()),HttpStatus.OK);
     }
-
-    @PostMapping("/chatgpt")
-    public ResponseEntity<?> requestFromChatgpt(@RequestBody RequestChatGpt tb) {
-        try {
-            return new ResponseEntity<>(ChatGptUtils.sendMessage(tb.getMessage()),HttpStatus.OK);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//
+//    @PostMapping("/chatgpt")
+//    public ResponseEntity<?> requestFromChatgpt(@RequestBody RequestChatGpt tb) {
+//        try {
+//            return new ResponseEntity<>(ChatGptUtils.sendMessage(tb.getMessage()),HttpStatus.OK);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }
