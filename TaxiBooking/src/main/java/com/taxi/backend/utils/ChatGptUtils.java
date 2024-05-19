@@ -34,6 +34,7 @@ public class ChatGptUtils {
         Request request = new Request.Builder()
                 .url(API_URL)
                 .post(RequestBody.create(jsonRequestBody, MediaType.get("application/json; charset=utf-8")))
+
                 .addHeader("Authorization", "Bearer " + API_KEY)
 
                 .build();
