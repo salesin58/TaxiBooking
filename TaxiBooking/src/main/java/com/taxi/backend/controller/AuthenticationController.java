@@ -11,6 +11,7 @@ import com.taxi.backend.dao.response.JwtAuthenticationResponse;
 import com.taxi.backend.service.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,8 +19,8 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @PostMapping("/sign/signup")
-    public ResponseEntity<SimpleMailMessage> signup(@RequestBody SignUpRequest request) {
-        return authenticationService.signup(request);
+    public ResponseEntity<SimpleMailMessage> signup(@RequestBody SignUpRequest request,@RequestParam("image") MultipartFile file) {
+        return authenticationService.signup(request,file);
     }
 
     @PostMapping("/sign/signin")

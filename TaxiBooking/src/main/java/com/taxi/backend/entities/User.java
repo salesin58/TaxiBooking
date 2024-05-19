@@ -27,6 +27,9 @@ public class User implements UserDetails {
     private String lastName;
     @Column(unique = true)
     private String email;
+    @Lob
+    @Column(name = "profilePicture",length = 1000)
+    private byte[] profilePicture;
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;

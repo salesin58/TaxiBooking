@@ -25,8 +25,6 @@ public class DriverRecordDTO {
 
     private Integer user_ıd;
 
-    private String LicenseDetails;
-
     private String activeCity;
 
     private String address;

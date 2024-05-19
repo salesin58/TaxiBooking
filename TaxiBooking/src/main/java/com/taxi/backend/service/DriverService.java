@@ -6,6 +6,7 @@ import com.taxi.backend.entities.Driver;
 import com.taxi.backend.entities.DriverApprovalStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface DriverService {
     Driver save(Driver driver);
     Driver update(DriverUpdateDTO driverUpdateDTO);
     void deleteById(Integer id);
-    Driver create(DriverRecordDTO driverRecordDTO);
+    Driver create(DriverRecordDTO driverRecordDTO, MultipartFile file,MultipartFile file2);
     List<Driver> findAvailableDriver(String city, DriverApprovalStatus status,String vehicleType);
+
+    Driver setDriverApprovalStatus(DriverApprovalStatus driverApprovalStatus, Integer driverId);
 }

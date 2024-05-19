@@ -7,6 +7,7 @@ import com.taxi.backend.entities.Role;
 import com.taxi.backend.repository.ConfirmationTokenRepository;
 import com.taxi.backend.repository.UserRepository;
 import com.taxi.backend.service.*;
+import com.taxi.backend.utils.ImageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,10 @@ import com.taxi.backend.dao.response.JwtAuthenticationResponse;
 import com.taxi.backend.entities.User;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @Service
@@ -41,10 +44,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final EmailService emailService;
 
     @Override
-    public ResponseEntity<SimpleMailMessage> signup(SignUpRequest request) {
-        var user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
-                .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).isEnabled(false)
-                .role(Role.USER).build();
+    public ResponseEntity<SimpleMailMessage> signup(SignUpRequest request, MultipartFile file) {
+        User user = null;
+        try {
+            user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
+                    .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).isEnabled(false)
+                    .role(Role.USER).profilePicture(ImageUtils.compressImage(file.getBytes())).build();
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         userRepository.save(user);
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
 

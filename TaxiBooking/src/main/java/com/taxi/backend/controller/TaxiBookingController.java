@@ -1,9 +1,11 @@
 package com.taxi.backend.controller;
 
+import com.taxi.backend.dao.request.RequestChatGpt;
 import com.taxi.backend.dao.request.TaxiBookingCreateRequest;
 import com.taxi.backend.dao.request.deliverDTO;
 import com.taxi.backend.entities.TaxiBooking;
 import com.taxi.backend.service.TaxiBookingService;
+import com.taxi.backend.utils.ChatGptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,5 +65,12 @@ public class TaxiBookingController {
         return new ResponseEntity<>(taxiBookingService.deliverTaxiBooking(tb.getTaxiId(), tb.getDriverId()),HttpStatus.OK);
     }
 
-
+    @PostMapping("/chatgpt")
+    public ResponseEntity<?> requestFromChatgpt(@RequestBody RequestChatGpt tb) {
+        try {
+            return new ResponseEntity<>(ChatGptUtils.sendMessage(tb.getMessage()),HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

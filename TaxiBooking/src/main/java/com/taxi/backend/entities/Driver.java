@@ -28,7 +28,9 @@ public class Driver  {
     @OneToOne
     private User user;
 
-    private String LicenseDetails;
+    @Lob
+    @Column(name = "lisensePhoto",length = 1000)
+    private byte[] lisensePhoto;
 
     @Enumerated(EnumType.STRING)
     private DriverApprovalStatus approvalStatus;

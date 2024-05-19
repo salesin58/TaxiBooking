@@ -3,6 +3,7 @@ package com.taxi.backend.controller;
 import com.taxi.backend.dao.model.DriverDTO;
 import com.taxi.backend.dao.model.DriverRecordDTO;
 import com.taxi.backend.dao.model.DriverUpdateDTO;
+import com.taxi.backend.dao.request.SetApprovalStatusDriver;
 import com.taxi.backend.dao.request.SignUpRequest;
 import com.taxi.backend.dao.response.MessageSourceResponse;
 import com.taxi.backend.entities.Driver;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -35,17 +37,17 @@ public class DriverController {
     private final MessageSource messageSource;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<DriverDTO> findDriverById(@PathVariable Integer id) {
+    public ResponseEntity<Driver> findDriverById(@PathVariable Integer id) {
 
         Driver driver = driverService.findOne(id);
         var driverDTO = DriverDTO.builder().vehicle(driver.getVehicle()).user(driver.getUser()).approvalStatus(driver.getApprovalStatus()).isAvailable(driver.getIsAvailable()).activeCity(driver.getActiveCity())
                 .lastKnownLocation(driver.getLastKnownLocation()).home(driver.getHome()).reviewDriver(driver.getReviewDriver()).build();
-        return ResponseEntity.ok(driverDTO);
+        return ResponseEntity.ok(driver);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<DriverDTO>> getDrivers() {
+    public ResponseEntity<List<Driver>> getDrivers() {
 
         List<Driver> drivers = driverService.findAll();
         List<DriverDTO> dtos = drivers.stream()
@@ -53,15 +55,15 @@ public class DriverController {
                 .collect(Collectors.toList());
 
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(drivers);
     }
 
-    @PostMapping
-    public ResponseEntity<DriverDTO> createDriver(@RequestBody DriverRecordDTO request) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<Driver> createDriver(@RequestBody DriverRecordDTO request,@RequestPart("licencePhoto") MultipartFile file,@RequestPart("vehiclePhoto") MultipartFile file2) {
 
-        var createDriver = driverService.create(request);
+        var createDriver = driverService.create(request,file,file2);
         var driverDTO = modelMapper.map(createDriver, DriverDTO.class);
-        return ResponseEntity.ok(driverDTO);
+        return ResponseEntity.ok(createDriver);
 
     }
 
@@ -76,6 +78,12 @@ public class DriverController {
 
         return new ResponseEntity<>(driverToUpdate, HttpStatus.OK);
     }
+    @PostMapping(value = "/setapprovalstatus")
+    public ResponseEntity<Driver> setApprovalStatus(@RequestBody SetApprovalStatusDriver setApprovalStatusDriver) {
 
+
+        return ResponseEntity.ok(driverService.setDriverApprovalStatus(setApprovalStatusDriver.getDriverApprovalStatus(),setApprovalStatusDriver.getId()));
+
+    }
 
 }

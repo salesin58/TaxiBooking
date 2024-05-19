@@ -29,5 +29,10 @@ public class Vehicle  {
     @ManyToOne(fetch = FetchType.EAGER)
     private VehicleType carType;
 
+    @Lob
+    @Column(name = "carPhoto",length = 1000)
+    private byte[] carPhoto;
+
+
 
 }

@@ -8,14 +8,14 @@ import com.taxi.backend.service.DriverService;
 import com.taxi.backend.service.ReviewDriverService;
 import com.taxi.backend.service.UserService;
 import com.taxi.backend.service.VehicleService;
-import io.jsonwebtoken.lang.Objects;
+import com.taxi.backend.utils.ImageUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -71,7 +71,6 @@ public class DriverServiceImpl implements DriverService {
         locationLastKnown.setLatitude(driverUpdateDTO.getLatitudeLastKnown());
         locationLastKnown.setLongitude(driverUpdateDTO.getLongitudeLastKnown());
         locationService.save(locationLastKnown);
-        driver.setLicenseDetails(driverUpdateDTO.getLicenseDetails());
         driver.setActiveCity(driverUpdateDTO.getActiveCity());
         Vehicle  vehicle=vehicleService.getVehicleById(driver.getVehicle().getId());
         vehicle.setColor(driverUpdateDTO.getColor());
@@ -100,7 +99,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Driver create(DriverRecordDTO driverRecordDTO) {
+    public Driver create(DriverRecordDTO driverRecordDTO, MultipartFile file,MultipartFile file2) {
 
         var locationHome = Location.builder().latitude(driverRecordDTO.getLatitude())
                 .longitude(driverRecordDTO.getLongitude())
@@ -115,31 +114,46 @@ public class DriverServiceImpl implements DriverService {
 
         var locationHome_ = locationService.save(locationHome);
         var locationLastKnown_ = locationService.save(locationLastKnown);
-        var vehicle = Vehicle.builder().brandAndModel(driverRecordDTO.getBrandAndModel()).color(driverRecordDTO.getColor()).carType(vehicleType).build();
+        Vehicle vehicle= null;
+        try {
+            vehicle = Vehicle.builder().brandAndModel(driverRecordDTO.getBrandAndModel()).color(driverRecordDTO.getColor()).carType(vehicleType).carPhoto(ImageUtils.compressImage(file2.getBytes())).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         var reviewDriver = ReviewDriver.builder().build();
-        var driver = Driver.builder().home(locationHome_)
-                .lastKnownLocation(locationLastKnown_)
-                .reviewDriver(reviewDriver)
-                .isAvailable(false)
-                .approvalStatus(DriverApprovalStatus.PENDING)
-                .LicenseDetails(driverRecordDTO.getLicenseDetails())
-                .vehicle(vehicle)
-                .activeCity(driverRecordDTO.getActiveCity()).build();
+        Driver driver = null;
+        try {
 
+            driver = Driver.builder().home(locationHome_)
+                    .lastKnownLocation(locationLastKnown_)
+                    .reviewDriver(reviewDriver)
+                    .isAvailable(false)
+                    .approvalStatus(DriverApprovalStatus.PENDING)
+                    .lisensePhoto(ImageUtils.compressImage(file.getBytes()))
+                    .vehicle(vehicle)
+                    .activeCity(driverRecordDTO.getActiveCity()).build();
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
 
         reviewDriver.setDriver(driver);
         vehicle.setDriver(driver);
-        save(driver);
-        User user = userService.findById(driver.getUser().getId());
-        user.setRole(Role.DRIVER);
-        userService.saved(user);
 
-        return driver;
+
+
+        return save(driver);
     }
 
     @Override
     public List<Driver> findAvailableDriver(String city,DriverApprovalStatus Status,String vehicleType) {
         return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(city,Status,vehicleType);
+    }
+    @Override
+    public Driver setDriverApprovalStatus(DriverApprovalStatus driverApprovalStatus, Integer driverId){
+        var driver=findOne(driverId);
+        driver.setApprovalStatus(driverApprovalStatus);
+        return driverRepository.save(driver);
+
     }
 }

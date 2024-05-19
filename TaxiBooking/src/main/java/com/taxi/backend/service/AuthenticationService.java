@@ -6,9 +6,10 @@ import com.taxi.backend.dao.request.SigninRequest;
 import com.taxi.backend.dao.response.JwtAuthenticationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthenticationService {
-    ResponseEntity<SimpleMailMessage> signup(SignUpRequest request);
+    ResponseEntity<SimpleMailMessage> signup(SignUpRequest request, MultipartFile file);
 
     JwtAuthenticationResponse signin(SigninRequest request);
 
