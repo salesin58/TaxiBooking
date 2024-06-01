@@ -1,27 +1,30 @@
 package com.taxi.backend.controller;
 
-import com.taxi.backend.dao.model.DriverUpdateDTO;
+import com.stripe.exception.StripeException;
+import com.taxi.backend.dao.request.ChargeRequest;
+import com.taxi.backend.dao.request.ChargeRequest.Currency;
+import com.taxi.backend.dao.request.NoteDTORequest;
 import com.taxi.backend.dao.request.SaveUserDTO;
-import com.taxi.backend.dao.response.MessageSourceResponse;
 import com.taxi.backend.dao.response.NoteUserDTO;
-import com.taxi.backend.entities.Driver;
-import com.taxi.backend.entities.Note;
 import com.taxi.backend.entities.User;
 import com.taxi.backend.service.UserService;
+import com.taxi.backend.service.IStripeService;
+import com.taxi.backend.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.ui.Model;
 
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/User")
@@ -29,8 +32,26 @@ import java.util.stream.Collectors;
 public class UserController {
     private final UserService userService;
     private final MessageSource messageSource;
+    private final IStripeService paymentsService;
 
+    @PostMapping("/charge")
+    public String charge(ChargeRequest chargeRequest, Model model)
+            throws StripeException {
+        chargeRequest.setDescription("Example charge");
+        chargeRequest.setCurrency(Currency.EUR);
+//        Charge charge = paymentsService.charge(chargeRequest);
+//        model.addAttribute("id", charge.getId());
+//        model.addAttribute("status", charge.getStatus());
+//        model.addAttribute("chargeId", charge.getId());
+//        model.addAttribute("balance_transaction", charge.getBalanceTransaction());
+        return "result";
+    }
 
+    @ExceptionHandler(StripeException.class)
+    public String handleError(Model model, StripeException ex) {
+        model.addAttribute("error", ex.getMessage());
+        return "result";
+    }
     @GetMapping
     public ResponseEntity<?> findUsers(Pageable page) {
         Page<User> users = userService.findAll(page);
@@ -61,18 +82,18 @@ public class UserController {
             return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
-    @PostMapping(value = "/{id}/note")
-    public ResponseEntity<?> creatingNote(@PathVariable Integer id, @RequestBody Note note){
+    @PostMapping(value = "/note")
+    public ResponseEntity<?> creatingNote(@RequestBody NoteDTORequest note){
         try {
-            note = userService.saveNote(id, note);
-            return new ResponseEntity<>(note, HttpStatus.OK);
+            var note_ = userService.saveNote(note);
+            return new ResponseEntity<>(note_, HttpStatus.OK);
         } catch (ResponseStatusException e) {
             return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping(value = "/{id}/note")
-    public ResponseEntity<?> findNotes(@PathVariable Integer id, Pageable page) {
+    public ResponseEntity<?> findNotes(@PathVariable Integer id) {
         try {
             NoteUserDTO noteUserDTO = userService.findNotes(id);
             return new ResponseEntity<>(noteUserDTO, HttpStatus.OK);
@@ -91,5 +112,25 @@ public class UserController {
 
         return new ResponseEntity<>(userToUpdate, HttpStatus.OK);
     }
+
+    @PostMapping("uploadImage")
+    public ResponseEntity<?> uploadProfileImage (@RequestParam("image") MultipartFile file, @RequestParam("id") Integer id) throws IOException {
+        User user=userService.findById(id);
+        user.setProfilePicture(ImageUtils.compressImage(file.getBytes()));
+
+        return new ResponseEntity<>(userService.saved(user), HttpStatus.OK);
+    }
+    @GetMapping("downloadImage/{id}")
+    public ResponseEntity<?> downdloadProfileImage ( @PathVariable  Integer id) throws IOException {
+        User user=userService.findById(id);
+
+        byte[] images=ImageUtils.compressImage(user.getProfilePicture());
+
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf("image/png"))
+                .body(images);
+    }
+
 
 }

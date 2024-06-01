@@ -23,15 +23,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
     private final static Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
-    private final JavaMailSender mailSender;
 
-    public EmailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    private JavaMailSender javaMailSender;
+
+    @Autowired
+    public EmailServiceImpl(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
     }
 
-    @Override
     @Async
-    public void sendEmail(SimpleMailMessage email) {
-        mailSender.send(email);
+    public void sendEmail(String to, String email) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            helper.setText(email, true);
+            helper.setTo(to);
+            helper.setSubject("Confirm your email");
+            helper.setFrom("hello@akechsalim.com");
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            LOGGER.error("Failed to send email", e);
+            throw new IllegalStateException("Failed to send email");
+        }
+
+
     }
 }

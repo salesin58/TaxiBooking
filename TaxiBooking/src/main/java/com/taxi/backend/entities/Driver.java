@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,8 +27,9 @@ public class Driver  {
     private Vehicle vehicle;
 
     @OneToOne
+    @JsonIgnore
     private User user;
-
+    @JsonIgnore
     @Lob
     @Column(name = "lisensePhoto",length = 1000)
     private byte[] lisensePhoto;
@@ -36,6 +38,7 @@ public class Driver  {
     private DriverApprovalStatus approvalStatus;
 
     @OneToMany(mappedBy = "driver",fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<TaxiBooking> taxiBookings = new ArrayList<>();
 
     private Boolean isAvailable;
@@ -49,6 +52,8 @@ public class Driver  {
     private Location home;
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private ReviewDriver reviewDriver;
+    @Transient
+    private Socket socket;
 
 
 

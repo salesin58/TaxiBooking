@@ -13,10 +13,8 @@ public class TaxiBookingCreateRequest {
 
     private Location fromLocation;
     private Location toLocation;
-
     private Long totalDistanceMeters;
     private String city;
-
     private Integer customerId;
     private String vehicleType;
 }

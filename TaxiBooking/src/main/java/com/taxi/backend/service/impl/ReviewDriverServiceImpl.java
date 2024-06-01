@@ -2,6 +2,7 @@ package com.taxi.backend.service.impl;
 
 import com.taxi.backend.entities.Driver;
 import com.taxi.backend.entities.ReviewDriver;
+import com.taxi.backend.entities.TaxiBookingStatus;
 import com.taxi.backend.entities.Vehicle;
 import com.taxi.backend.repository.DriverRepository;
 import com.taxi.backend.repository.ReviewDriverRepository;
@@ -37,10 +38,10 @@ public class ReviewDriverServiceImpl implements ReviewDriverService {
         }
         Driver driver = driverOptional.get();
         ReviewDriver reviewDriver =  driverReviewRepository.findByDriver(driver);
-        reviewDriver.setTotalCus(taxiBookingRepository.countAllRatingByDriver_Id(id));
-        reviewDriver.setTotalPoint(taxiBookingRepository.sumAllRatingByDriver_Id(id)/ reviewDriver.getTotalCus());
+        reviewDriver.setTotalCus(taxiBookingRepository.countAllRatingByDriver_Id(id, TaxiBookingStatus.COMPLETED));
+        reviewDriver.setTotalPoint(taxiBookingRepository.sumAllRatingByDriver_Id(id,TaxiBookingStatus.COMPLETED)/ reviewDriver.getTotalCus());
 
-        return reviewDriver;
+        return driverReviewRepository.save(reviewDriver);
     }
 
     @Override

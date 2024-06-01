@@ -1,8 +1,6 @@
 package com.taxi.backend.controller;
 
-import com.taxi.backend.dao.request.RequestChatGpt;
-import com.taxi.backend.dao.request.TaxiBookingCreateRequest;
-import com.taxi.backend.dao.request.deliverDTO;
+import com.taxi.backend.dao.request.*;
 import com.taxi.backend.entities.TaxiBooking;
 import com.taxi.backend.service.TaxiBookingService;
 import com.taxi.backend.utils.ChatGptUtils;
@@ -54,23 +52,58 @@ public class TaxiBookingController {
 
         return new ResponseEntity<>(taxiBookingToUpdate, HttpStatus.OK);
     }
-   @PostMapping(value = "/driver/find")
-    public ResponseEntity<?> findingSuitableDrivers(@RequestBody TaxiBooking tb) {
-
-     return new ResponseEntity<>(taxiBookingService.findcloseSuitableDriver(tb), HttpStatus.OK);
+   @PostMapping(value = "/driver/find/{id}")
+    public ResponseEntity<?> findingSuitableDrivers(@PathVariable Integer id) {
+var taxiBooking = taxiBookingService.findTaxiBookingById(id);
+     return new ResponseEntity<>(taxiBookingService.findcloseSuitableDriver(taxiBooking), HttpStatus.OK);
     }
     @PostMapping(value = "/driver/deliver")
     public ResponseEntity<?> deliverTaxiBooking(@RequestBody deliverDTO tb) {
 
         return new ResponseEntity<>(taxiBookingService.deliverTaxiBooking(tb.getTaxiId(), tb.getDriverId()),HttpStatus.OK);
     }
-//
-//    @PostMapping("/chatgpt")
-//    public ResponseEntity<?> requestFromChatgpt(@RequestBody RequestChatGpt tb) {
-//        try {
-//            return new ResponseEntity<>(ChatGptUtils.sendMessage(tb.getMessage()),HttpStatus.OK);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+
+    @PostMapping("/chatgpt")
+    public ResponseEntity<?> requestFromChatgpt(@RequestBody RequestChatGpt tb) {
+        try {
+            return new ResponseEntity<>(ChatGptUtils.sendMessage(tb.getMessage()),HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @PostMapping("payment")
+    public ResponseEntity<?> payment(@RequestBody PaymentRequest paymentRequest){
+
+        String taxiBookingToPayment;
+        try {
+            taxiBookingToPayment = taxiBookingService.payment(paymentRequest.getAmount(),paymentRequest.getId());
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(messageSource.getMessage("taxiBooking.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(taxiBookingToPayment, HttpStatus.OK);
+    }
+    @PostMapping("endbooking")
+    public ResponseEntity<?> endbooking(@RequestBody TaxiBookingEndRequest taxiBookingEndRequest){
+        return new ResponseEntity<> (taxiBookingService.tripEnd(taxiBookingEndRequest), HttpStatus.OK);
+
+    }
+    @PostMapping("rideendstartstatus")
+    public ResponseEntity<?> statusEndStartRide(@RequestBody StatusRideRequest statusRideRequest) {
+        return new ResponseEntity<> (taxiBookingService.findStatusTaxiBookingByUserId(statusRideRequest.getId(),statusRideRequest.getStatus()), HttpStatus.OK);
+    }
+    @GetMapping("ridestatus/{id}")
+    public ResponseEntity<?> statusRide(@PathVariable Integer id) {
+        return new ResponseEntity<> (taxiBookingService.findRideStatusTaxiBookingByCusId(id), HttpStatus.OK);
+
+    }
+    @GetMapping("alltripdriverıd/{id}")
+    public ResponseEntity<?> alltripDriver(@PathVariable Integer id)
+    {
+        return new ResponseEntity<>(taxiBookingService.allTripDriverId(id), HttpStatus.OK);
+
+    }
+    @PostMapping("settaxibookingstatus")
+    public ResponseEntity<?> setTaxiBookingStatus(@RequestBody StatusRideRequest statusRideRequest){
+        return new ResponseEntity<>(taxiBookingService.setTaxiBookingStatus(statusRideRequest.getStatus(),statusRideRequest.getId()), HttpStatus.OK);
+    }
 }

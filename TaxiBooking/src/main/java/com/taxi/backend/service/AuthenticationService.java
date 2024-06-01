@@ -9,7 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthenticationService {
-    ResponseEntity<SimpleMailMessage> signup(SignUpRequest request, MultipartFile file);
+    ResponseEntity<String> signup(SignUpRequest request);
 
     JwtAuthenticationResponse signin(SigninRequest request);
 

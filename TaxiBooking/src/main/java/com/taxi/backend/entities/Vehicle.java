@@ -1,5 +1,6 @@
 package com.taxi.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.domain.Auditable;
@@ -17,6 +18,7 @@ public class Vehicle  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @OneToOne(mappedBy = "vehicle")
+    @JsonIgnore
     private Driver driver;
 
 
@@ -28,7 +30,7 @@ public class Vehicle  {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private VehicleType carType;
-
+    @JsonIgnore
     @Lob
     @Column(name = "carPhoto",length = 1000)
     private byte[] carPhoto;

@@ -6,7 +6,7 @@ spring:
     # Provide database platform that is being used
     hibernate:
       # New database is created when application starts and destroyed when application is stopped
-      ddl-auto: create-drop
+      ddl-auto: update
     # Show sql when spring data jpa performs query
     show-sql: true
     properties:
@@ -21,8 +21,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: hakan.ari55555@gmail.com
-    password:  Ahmet369212.
+    username: yavuzalbayrak55@gmail.com
+    password: etpp vuno nbov tjeh
 
     properties:
       mail:
@@ -36,5 +36,10 @@ token:
   signing:
     key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
 stripe:
-  publickey: pk_test_51PHtVkRr3vNbpBV1bqkAYfGqX8z8oINlXo2C43bVifC2hCjLCZYpu51TwNqlV8vmltgCFkuh6GH3xwqRUZbobphC00HaDgtwnk
-  secretkey: sk_test_51PHtVkRr3vNbpBV1T4ANp5mzH7TSBaCe95TfQ2ZYcylqaF4ChS0MTPdUzb80s914pO893v1f1q2jazvvWiIb9gMh00YJumufwd
+  api:
+    key: sk_test_51PHtVkRr3vNbpBV1T4ANp5mzH7TSBaCe95TfQ2ZYcylqaF4ChS0MTPdUzb80s914pO893v1f1q2jazvvWiIb9gMh00YJumufwd
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

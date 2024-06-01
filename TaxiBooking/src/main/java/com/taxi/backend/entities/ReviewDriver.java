@@ -1,5 +1,6 @@
 package com.taxi.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public class ReviewDriver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @OneToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private Driver  driver;
     private Integer totalPoint;
     private Integer totalCus;

@@ -18,7 +18,7 @@ public class Customer{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(fetch =FetchType.EAGER, cascade = CascadeType.ALL )
     private List<TaxiBooking> taxiBookings = new ArrayList<>();
     @OneToOne(fetch = FetchType.EAGER)
     private User user;

@@ -4,6 +4,7 @@ import com.taxi.backend.entities.VehicleType;
 import com.taxi.backend.repository.VehicleTypeRepository;
 import com.taxi.backend.service.IVehicleTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,12 +15,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class VehicleTypeService implements IVehicleTypeService {
-    private VehicleTypeRepository vehicleTypeRepository;
-
-    public VehicleTypeService(VehicleTypeRepository vehicleTypeRepository) {
-        this.vehicleTypeRepository = vehicleTypeRepository;
-    }
-
+    private final VehicleTypeRepository vehicleTypeRepository;
+    @Cacheable("vehicleTypes")
     @Override
     public List<VehicleType> findAll() {
         return vehicleTypeRepository.findAll();

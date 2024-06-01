@@ -1,7 +1,5 @@
-package com.taxi.backend.dao.response;
+package com.taxi.backend.dao.request;
 
-import com.taxi.backend.entities.Customer;
-import com.taxi.backend.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtAuthenticationResponse {
+public class PaymentTaxiRequest {
+    private String currency;
+    private long amount;
+    private String description;
     private String token;
-    private Customer customer;
 }

@@ -1,8 +1,8 @@
 package com.taxi.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -21,14 +21,15 @@ public class TaxiBooking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Driver driver;
 
-    @OneToOne(fetch =FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private VehicleType vehicleType;
 
     @Enumerated(EnumType.STRING)
-    private TaxiBookingStatus TaxibookingStatus;
+    private TaxiBookingStatus taxibookingStatus;
 
     @OneToMany(fetch =FetchType.EAGER, cascade = CascadeType.ALL )
     private List<Location> route = new ArrayList<>();
@@ -41,11 +42,17 @@ public class TaxiBooking {
     private Date endTime;
 
     private Long totalDistanceMeters;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Customer customer;
-    @Min(0)
-    @Max(5)
+
+    @Nullable
     private Integer rating;
+
+    @Nullable
+    private Integer amount;
+
+    private boolean isPayment;
 
 
 }

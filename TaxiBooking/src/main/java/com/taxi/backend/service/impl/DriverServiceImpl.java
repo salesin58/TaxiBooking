@@ -8,13 +8,10 @@ import com.taxi.backend.service.DriverService;
 import com.taxi.backend.service.ReviewDriverService;
 import com.taxi.backend.service.UserService;
 import com.taxi.backend.service.VehicleService;
-import com.taxi.backend.utils.ImageUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +77,7 @@ public class DriverServiceImpl implements DriverService {
         vehicle.setBrandAndModel(driverUpdateDTO.getBrandAndModel());
         driver.setVehicle(vehicle);
         vehicleService.save(vehicle);
-        return save(driver);
+        return driverRepository.save(driver);
 
     }
 
@@ -99,7 +96,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Driver create(DriverRecordDTO driverRecordDTO, MultipartFile file,MultipartFile file2) {
+    public Driver create(DriverRecordDTO driverRecordDTO) {
 
         var locationHome = Location.builder().latitude(driverRecordDTO.getLatitude())
                 .longitude(driverRecordDTO.getLongitude())
@@ -115,26 +112,23 @@ public class DriverServiceImpl implements DriverService {
         var locationHome_ = locationService.save(locationHome);
         var locationLastKnown_ = locationService.save(locationLastKnown);
         Vehicle vehicle= null;
-        try {
-            vehicle = Vehicle.builder().brandAndModel(driverRecordDTO.getBrandAndModel()).color(driverRecordDTO.getColor()).carType(vehicleType).carPhoto(ImageUtils.compressImage(file2.getBytes())).build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+            vehicle = Vehicle.builder().brandAndModel(driverRecordDTO.getBrandAndModel()).color(driverRecordDTO.getColor()).carType(vehicleType).build();
+
         var reviewDriver = ReviewDriver.builder().build();
         Driver driver = null;
-        try {
+       var user= userService.findById(driverRecordDTO.getUser_ıd());
+
 
             driver = Driver.builder().home(locationHome_)
                     .lastKnownLocation(locationLastKnown_)
                     .reviewDriver(reviewDriver)
                     .isAvailable(false)
                     .approvalStatus(DriverApprovalStatus.PENDING)
-                    .lisensePhoto(ImageUtils.compressImage(file.getBytes()))
+                    .user(user)
                     .vehicle(vehicle)
                     .activeCity(driverRecordDTO.getActiveCity()).build();
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+
 
 
         reviewDriver.setDriver(driver);
@@ -146,8 +140,8 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<Driver> findAvailableDriver(String city,DriverApprovalStatus Status,String vehicleType) {
-        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(city,Status,vehicleType);
+    public List<Driver> findAvailableDriver(String city,DriverApprovalStatus status,String vehicleType) {
+        return driverRepository.findAllByActiveCityAndIsAvailableTrueAndApprovalStatus(city,status,vehicleType);
     }
     @Override
     public Driver setDriverApprovalStatus(DriverApprovalStatus driverApprovalStatus, Integer driverId){
@@ -155,5 +149,27 @@ public class DriverServiceImpl implements DriverService {
         driver.setApprovalStatus(driverApprovalStatus);
         return driverRepository.save(driver);
 
+    }
+    @Override
+    public Driver findByUserId(Integer userId){
+        return driverRepository.findByUserId(userId);
+    }
+    @Override
+    public Driver open(Location location_, Integer id){
+   var driver = findOne(id);
+   Location location=locationService.findLocationById(driver.getLastKnownLocation().getId());
+   location.setLongitude(location_.getLongitude());
+   location.setLatitude(location_.getLatitude());
+   location.setAddress(location_.getAddress());
+   location=locationService.save(location);
+   driver.setLastKnownLocation(location);
+   driver.setIsAvailable(true);
+        return driverRepository.save(driver);
+    }
+    @Override
+    public Driver close(Integer id){
+        var driver = findOne(id);
+        driver.setIsAvailable(false);
+        return driverRepository.save(driver);
     }
 }

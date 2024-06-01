@@ -5,6 +5,7 @@ import com.taxi.backend.entities.ConfirmationToken;
 import com.taxi.backend.entities.Customer;
 import com.taxi.backend.entities.Role;
 import com.taxi.backend.repository.ConfirmationTokenRepository;
+import com.taxi.backend.repository.CustomerRepository;
 import com.taxi.backend.repository.UserRepository;
 import com.taxi.backend.service.*;
 import com.taxi.backend.utils.ImageUtils;
@@ -42,32 +43,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final CustomerService customerService;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final EmailService emailService;
+    private final CustomerRepository customerRepository;
 
     @Override
-    public ResponseEntity<SimpleMailMessage> signup(SignUpRequest request, MultipartFile file) {
+    public ResponseEntity<String> signup(SignUpRequest request) {
         User user = null;
-        try {
+
             user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName())
                     .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).isEnabled(false)
-                    .role(Role.USER).profilePicture(ImageUtils.compressImage(file.getBytes())).build();
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+                    .role(Role.USER).gender(request.getGender()).mobileNumber(request.getMobileNumber()).isBlocked(false)
+                    //.profilePicture(ImageUtils.compressImage(file.getBytes()))
+                    .build();
+
         userRepository.save(user);
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
 
         confirmationTokenRepository.save(confirmationToken);
-
+        String link="http://localhost:8080/api/v1/auth/confirm-account?token="+confirmationToken.getConfirmationToken();
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Kaydı tamamla");
-        mailMessage.setText("Hesabının onaylanması için lütfen tıklıyınız. : "
-                +"http://localhost:8080/api/v1/auth/confirm-account?token="+confirmationToken.getConfirmationToken());
-      //  emailService.send(user.getEmail(),);
+        mailMessage.setText(buildEmail(user.getFirstName(),link));
+
+        emailService.sendEmail(user.getEmail(),buildEmail(user.getFirstName(),link));
 
 
-        return ResponseEntity.ok(mailMessage);
+        return ResponseEntity.ok("Lütfen mailinize bakınız ");
 
     }
 
@@ -78,7 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
         var jwt = jwtService.generateToken(user);
-        return JwtAuthenticationResponse.builder().token(jwt).build();
+
+        return JwtAuthenticationResponse.builder().token(jwt).customer(customerRepository.findByUserId(user.getId())).build();
     }
     private boolean isTruePassword(User user,String oldPassword) {
         log.info("Checking if password exists " + this.getClass().getName());
@@ -118,6 +121,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return ResponseEntity.badRequest().body("Error: Couldn't verify email");
     }
+
     private String buildEmail(String name, String link) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +
@@ -136,7 +140,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 "                  \n" +
                 "                    </td>\n" +
                 "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
-                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
+                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Lütfen Emailiniz Onaylayınız</span>\n" +
                 "                    </td>\n" +
                 "                  </tr>\n" +
                 "                </tbody></table>\n" +
@@ -174,7 +178,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Merhaba " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Kayıt olduğunuz için teşekkürler. Hesabınızı etkinleştirmek için lütfen aşağıdaki bağlantıya tıklayın: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Aktive et</a> </p></blockquote>\n Bağlantının süresi 15 dakika içinde dolacak. <p>Yakında görüşürüz :)</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +

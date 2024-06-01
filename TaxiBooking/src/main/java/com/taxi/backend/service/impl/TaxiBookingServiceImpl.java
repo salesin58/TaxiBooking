@@ -43,8 +43,8 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
         var findCustom=findCustomer.get();
         Date now = new Date();
         var taxiBooking = TaxiBooking.builder().route(route).customer(findCustom).startTime(now)
-                .totalDistanceMeters(tb.getTotalDistanceMeters()).customer(findCustom)
-                .TaxibookingStatus(TaxiBookingStatus.SCHEDULE).vehicleType(findVehicleTypeByname).city(tb.getCity()).build();
+                .totalDistanceMeters(tb.getTotalDistanceMeters()).customer(findCustom).amount(10)
+                .taxibookingStatus(TaxiBookingStatus.SCHEDULE).vehicleType(findVehicleTypeByname).city(tb.getCity()).build();
 
         return taxiBookingRepository.save(taxiBooking);
     }
@@ -60,11 +60,12 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
     }
     @Override
     public List<Driver> findSuitableDriver(TaxiBooking taxiBooking){
-        return driverRepository.findByActiveCityAndIsAvailableTrueAndApprovalStatus(taxiBooking.getCity(), DriverApprovalStatus.APPROVED,taxiBooking.getVehicleType().getName());
+        return driverRepository.findAllByActiveCityAndIsAvailableTrueAndApprovalStatus(taxiBooking.getCity(), DriverApprovalStatus.APPROVED,taxiBooking.getVehicleType().getName());
     }
     @Override
     public List<DriverDistanceDTO> findcloseSuitableDriver(TaxiBooking taxiBooking){
         List<Driver> drivers=findSuitableDriver(taxiBooking);
+
         List<DriverDistanceDTO> driverDistanceDTOs=new ArrayList<>();
         for (int i = 0; i < drivers.size(); i++) {
             DriverDistanceDTO distanceDTO=DriverDistanceDTO.builder().driver(drivers.get(i))
@@ -111,7 +112,8 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
       driverService.save(driver);
         return taxiBookingRepository.save(taxiBooking);
     }
-    public TaxiBooking setTaxiBookingStatus(TaxiBookingStatus taxiBookingStatus,Integer id)
+    @Override
+    public TaxiBooking setTaxiBookingStatus(TaxiBookingStatus taxiBookingStatus, Integer id)
     {
         var taxiBooking=findTaxiBookingById(id);
         taxiBooking.setTaxibookingStatus(taxiBookingStatus);
@@ -121,4 +123,24 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
     public Set<TaxiBooking> allTripDriverId(Integer driverId){
         return  taxiBookingRepository.findAllByDriver_Id(driverId);
     }
+    @Override
+    public String payment(int amount,Integer id){
+        var taxiBooking=findTaxiBookingById(id);
+        taxiBooking.setPayment(true);
+        taxiBooking.setAmount(amount);
+        taxiBookingRepository.save(taxiBooking);
+
+        return "ödeme alınmıştır ";
+    }
+    @Override
+    public List<TaxiBooking> findStatusTaxiBookingByUserId(Integer cusId,TaxiBookingStatus taxiBookingStatus) {
+        return taxiBookingRepository.findAllByCustomer_IdAndTaxibookingStatus(cusId,taxiBookingStatus);
+
+
+    }
+    @Override
+    public TaxiBooking findRideStatusTaxiBookingByCusId(Integer cusId){
+        return taxiBookingRepository.findStatusTaxiBookingByid(cusId,TaxiBookingStatus.CAB_ARRIVED,TaxiBookingStatus.IN_RIDE,TaxiBookingStatus.CAB_DELIVERED);
+    }
+
 }

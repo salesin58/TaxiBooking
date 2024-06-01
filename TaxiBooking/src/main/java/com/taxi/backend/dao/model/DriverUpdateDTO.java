@@ -17,8 +17,6 @@ public class DriverUpdateDTO {
 
     private Integer carType;
 
-    private String LicenseDetails;
-
     private String activeCity;
 
     private String addressHome;

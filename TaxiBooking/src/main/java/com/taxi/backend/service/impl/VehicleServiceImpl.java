@@ -15,12 +15,12 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     @Override
     public Vehicle save(Vehicle vehicle) {
-        return null;
+        return vehicleRepository.save(vehicle);
     }
 
     @Override
     public Vehicle getVehicleByDriver_Id(Integer id) {
-        return null;
+        return vehicleRepository.findByDriverId(id);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.taxi.backend.entities;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +28,7 @@ public class User implements UserDetails {
     private String lastName;
     @Column(unique = true)
     private String email;
+    @JsonIgnore
     @Lob
     @Column(name = "profilePicture",length = 1000)
     private byte[] profilePicture;

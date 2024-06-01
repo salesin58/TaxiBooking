@@ -50,7 +50,10 @@ public class VehicleTypeController {
 
     @PostMapping
     public ResponseEntity<VehicleType> createDriver(@RequestBody VehicleTypeDTO request) {
-        var vehicleType = modelMapper.map(request, VehicleType.class);
+        VehicleType vehicleType = new VehicleType();
+        vehicleType.setName(request.getName());
+        vehicleType.setPricePerKm(request.getPricePerKm());
+        vehicleType.setMaxKm(request.getMaxKm());
         var createDriver = vehicleTypeService.save(vehicleType);
         return ResponseEntity.ok(createDriver);
 

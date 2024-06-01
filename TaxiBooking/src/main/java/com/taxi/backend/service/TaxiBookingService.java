@@ -5,6 +5,7 @@ import com.taxi.backend.dao.request.TaxiBookingCreateRequest;
 import com.taxi.backend.dao.request.TaxiBookingEndRequest;
 import com.taxi.backend.entities.Driver;
 import com.taxi.backend.entities.TaxiBooking;
+import com.taxi.backend.entities.TaxiBookingStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -26,5 +27,13 @@ public interface TaxiBookingService {
 
     TaxiBooking findTaxiBookingById(int id);
 
+    TaxiBooking setTaxiBookingStatus(TaxiBookingStatus taxiBookingStatus, Integer id);
+
     Set<TaxiBooking> allTripDriverId(Integer driverId);
+
+    String payment(int amount, Integer id);
+
+    List<TaxiBooking> findStatusTaxiBookingByUserId(Integer userId,TaxiBookingStatus taxiBookingStatus);
+
+    TaxiBooking findRideStatusTaxiBookingByCusId(Integer cusId);
 }

@@ -19,8 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @PostMapping("/sign/signup")
-    public ResponseEntity<SimpleMailMessage> signup(@RequestBody SignUpRequest request,@RequestParam("image") MultipartFile file) {
-        return authenticationService.signup(request,file);
+    public ResponseEntity<String> signup(@RequestBody SignUpRequest request) {
+        return authenticationService.signup(request);
     }
 
     @PostMapping("/sign/signin")

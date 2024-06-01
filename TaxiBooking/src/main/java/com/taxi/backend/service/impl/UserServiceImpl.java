@@ -1,6 +1,7 @@
 package com.taxi.backend.service.impl;
 
 import com.taxi.backend.dao.model.NoteDTO;
+import com.taxi.backend.dao.request.NoteDTORequest;
 import com.taxi.backend.dao.request.SaveUserDTO;
 import com.taxi.backend.dao.response.NoteUserDTO;
 import com.taxi.backend.entities.Note;
@@ -96,19 +97,22 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         User user = userO.get();
         List<Note> notes = noteRepository.findByUser(user);
-        List<NoteDTO> notesDTO = List.of();
+        List<NoteDTO> notesDTO = new java.util.ArrayList<>(List.of());
         for (int i = 0; i < notes.size(); i++) {
-        notesDTO.add(new NoteDTO(notes.get(i)));
+        NoteDTO noteDTO = NoteDTO.builder().user(user).message(notes.get(i).getMessage()).date(notes.get(i).getDate()).id(notes.get(i).getId()).build();
+        notesDTO.add(noteDTO);
         }
         return new NoteUserDTO((long) notesDTO.size(), notesDTO);
     }
 
     @Override
-    public Note saveNote(Integer id, Note note) {
-        Optional<User> user_ = userRepository.findById(id);
+    public Note saveNote(NoteDTORequest NOTE_) {
+        Optional<User> user_ = userRepository.findById(NOTE_.getUserID());
         if(user_.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         User user = user_.get();
+        Note note = new Note();
+        note.setMessage(NOTE_.getMessage());
         note.setUser(user);
         note.setDate(LocalDateTime.now());
 
@@ -117,6 +121,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByEmail(String email) {
-        return null;
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return user.get();
     }
 }
