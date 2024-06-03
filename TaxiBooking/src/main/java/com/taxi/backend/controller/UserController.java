@@ -124,13 +124,22 @@ public class UserController {
     public ResponseEntity<?> downdloadProfileImage ( @PathVariable  Integer id) throws IOException {
         User user=userService.findById(id);
 
-        byte[] images=ImageUtils.compressImage(user.getProfilePicture());
+        byte[] images=ImageUtils.decompressImage(user.getProfilePicture());
 
 
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf("image/png"))
                 .body(images);
     }
-
+@GetMapping ("/{id}")
+    public ResponseEntity<?> findUserByid(@PathVariable  Integer id){
+        User user;
+    try {
+        user = userService.findById(id);
+    }catch (ResponseStatusException e){
+        return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(user, HttpStatus.OK);
+}
 
 }

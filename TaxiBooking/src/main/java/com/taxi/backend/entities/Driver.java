@@ -27,7 +27,6 @@ public class Driver  {
     private Vehicle vehicle;
 
     @OneToOne
-    @JsonIgnore
     private User user;
     @JsonIgnore
     @Lob
