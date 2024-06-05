@@ -1,6 +1,7 @@
 package com.taxi.backend.controller;
 
 import com.taxi.backend.dao.request.*;
+import com.taxi.backend.dao.response.TaxiBookingIdResponse;
 import com.taxi.backend.entities.TaxiBooking;
 import com.taxi.backend.service.TaxiBookingService;
 import com.taxi.backend.utils.ChatGptUtils;
@@ -105,5 +106,13 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
     @PostMapping("settaxibookingstatus")
     public ResponseEntity<?> setTaxiBookingStatus(@RequestBody StatusRideRequest statusRideRequest){
         return new ResponseEntity<>(taxiBookingService.setTaxiBookingStatus(statusRideRequest.getStatus(),statusRideRequest.getId()), HttpStatus.OK);
+    }
+    @GetMapping("get/{id}")
+    public ResponseEntity<?> findTaxiBookingIdsById(@PathVariable Integer id) {
+        var taxiBooking= taxiBookingService.findTaxiBookingById(id);
+        var taxiBookingToReturn = TaxiBookingIdResponse.builder().taxiBookingId(taxiBooking.getId())
+                .taxiCustomerId(taxiBooking.getCustomer().getId()).taxiDriverId(taxiBooking.getDriver().getId())
+                .taxiVehicleTypeId(taxiBooking.getVehicleType().getId()).build();
+        return ResponseEntity.ok(taxiBookingToReturn);
     }
 }
