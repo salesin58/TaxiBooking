@@ -24,5 +24,5 @@ public interface TaxiBookingRepository extends JpaRepository<TaxiBooking, Intege
 
     List<TaxiBooking> findAllByCustomer_IdAndTaxibookingStatus(Integer Customer_Id, TaxiBookingStatus taxiBookingStatus);
     @Query("SELECT r from TaxiBooking r WHERE r.customer.id=:id and (r.taxibookingStatus=:status1 or r.taxibookingStatus=:status2 or r.taxibookingStatus=:status3 )")
-   TaxiBooking findStatusTaxiBookingByid(@Param("id") Integer id, @Param("status1") TaxiBookingStatus status1, @Param("status2") TaxiBookingStatus status2, @Param("status3") TaxiBookingStatus status3);
+   List<TaxiBooking> findStatusTaxiBookingByid(@Param("id") Integer id, @Param("status1") TaxiBookingStatus status1, @Param("status2") TaxiBookingStatus status2, @Param("status3") TaxiBookingStatus status3);
 }

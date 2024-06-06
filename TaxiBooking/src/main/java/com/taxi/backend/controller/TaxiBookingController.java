@@ -94,7 +94,18 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
     }
     @GetMapping("ridestatus/{id}")
     public ResponseEntity<?> statusRide(@PathVariable Integer id) {
-        return new ResponseEntity<> (taxiBookingService.findRideStatusTaxiBookingByCusId(id), HttpStatus.OK);
+        var taxiBookingList=taxiBookingService.findRideStatusTaxiBookingByCusId(id);
+        TaxiBooking taxiBooking = null;
+        try {
+            if(!taxiBookingList.isEmpty()){ 
+                taxiBooking=taxiBookingList.get(taxiBookingList.size()-1);
+            }
+
+        }  catch (ResponseStatusException e) {
+        return new ResponseEntity<>(messageSource.getMessage("taxiBooking.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+    }
+
+        return new ResponseEntity<> (taxiBooking, HttpStatus.OK);
 
     }
     @GetMapping("alltripdriverıd/{id}")

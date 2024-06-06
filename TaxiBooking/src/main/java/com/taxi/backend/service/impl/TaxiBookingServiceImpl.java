@@ -139,7 +139,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 
     }
     @Override
-    public TaxiBooking findRideStatusTaxiBookingByCusId(Integer cusId){
+    public List<TaxiBooking> findRideStatusTaxiBookingByCusId(Integer cusId){
         return taxiBookingRepository.findStatusTaxiBookingByid(cusId,TaxiBookingStatus.CAB_ARRIVED,TaxiBookingStatus.IN_RIDE,TaxiBookingStatus.CAB_DELIVERED);
     }
 
