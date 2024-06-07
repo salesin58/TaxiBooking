@@ -39,5 +39,7 @@ public interface TaxiBookingService {
     List<TaxiBooking> findStatusTaxiBookingByDriverId(Integer DriverId,TaxiBookingStatus taxiBookingStatus);
 
     List<TaxiBooking> findRideStatusTaxiBookingByDriverId(Integer cusId);
+    List<TaxiBooking> findRideStatus2TaxiBookingByDriverId(Integer driverId);
+    List<TaxiBooking> findRideStatus2TaxiBookingByCusId(Integer cusId);
 }
 

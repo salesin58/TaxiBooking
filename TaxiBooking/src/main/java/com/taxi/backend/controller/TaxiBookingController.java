@@ -146,5 +146,13 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
                 .taxiVehicleTypeId(taxiBooking.getVehicleType().getId()).build();
         return ResponseEntity.ok(taxiBookingToReturn);
     }
+    @GetMapping("rideComplotedCancelledDriver/{id})")
+    public ResponseEntity<?> rideComplotedCancelledDriver(@PathVariable Integer id){
+        return new ResponseEntity<>(taxiBookingService.findRideStatus2TaxiBookingByDriverId(id), HttpStatus.OK);
+    }
+    @GetMapping("rideComplotedCancelledCustomer/{id})")
+    public ResponseEntity<?> rideComplotedCancelledCustomer(@PathVariable Integer id){
+        return new ResponseEntity<>(taxiBookingService.findRideStatus2TaxiBookingByCusId(id), HttpStatus.OK);
+    }
 
 }

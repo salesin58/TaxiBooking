@@ -150,5 +150,15 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
         return taxiBookingRepository.findStatusTaxiBookingByDriverid(cusId ,TaxiBookingStatus.CAB_ARRIVED,TaxiBookingStatus.IN_RIDE,TaxiBookingStatus.CAB_DELIVERED);
     }
 
+    @Override
+    public List<TaxiBooking> findRideStatus2TaxiBookingByDriverId(Integer driverId) {
+        return taxiBookingRepository.findStatusTaxiBookingBy2Driverid(driverId,TaxiBookingStatus.CANCELED,TaxiBookingStatus.COMPLETED);
+    }
+
+    @Override
+    public List<TaxiBooking> findRideStatus2TaxiBookingByCusId(Integer cusId) {
+        return taxiBookingRepository.findStatusTaxiBooking2Byid(cusId,TaxiBookingStatus.CANCELED,TaxiBookingStatus.COMPLETED);
+    }
+
 
 }
