@@ -5,5 +5,6 @@ public enum TaxiBookingStatus {
     IN_RIDE,
     CAB_ARRIVED,
     CAB_DELIVERED,
-    COMPLETED
+    COMPLETED,
+    CANCELED
 }

@@ -21,8 +21,7 @@ public class TaxiBooking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     private Driver driver;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -42,8 +41,7 @@ public class TaxiBooking {
     private Date endTime;
 
     private Long totalDistanceMeters;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
     private Customer customer;
 
     @Nullable
