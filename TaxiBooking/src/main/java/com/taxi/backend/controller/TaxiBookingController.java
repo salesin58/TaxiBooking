@@ -92,6 +92,10 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
     public ResponseEntity<?> statusEndStartRide(@RequestBody StatusRideRequest statusRideRequest) {
         return new ResponseEntity<> (taxiBookingService.findStatusTaxiBookingByUserId(statusRideRequest.getId(),statusRideRequest.getStatus()), HttpStatus.OK);
     }
+    @PostMapping("rideDriverendstartstatus")
+    public ResponseEntity<?> statusDriverEndStartRide(@RequestBody StatusRideRequest statusRideRequest) {
+        return new ResponseEntity<> (taxiBookingService.findStatusTaxiBookingByDriverId(statusRideRequest.getId(),statusRideRequest.getStatus()), HttpStatus.OK);
+    }
     @GetMapping("ridestatus/{id}")
     public ResponseEntity<?> statusRide(@PathVariable Integer id) {
         var taxiBookingList=taxiBookingService.findRideStatusTaxiBookingByCusId(id);
@@ -104,6 +108,22 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
         }  catch (ResponseStatusException e) {
         return new ResponseEntity<>(messageSource.getMessage("taxiBooking.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
     }
+
+        return new ResponseEntity<> (taxiBooking, HttpStatus.OK);
+
+    }
+    @GetMapping("rideDriverstatus/{id}")
+    public ResponseEntity<?> statusDriverRide(@PathVariable Integer id) {
+        var taxiBookingList=taxiBookingService.findRideStatusTaxiBookingByDriverId(id);
+        TaxiBooking taxiBooking = null;
+        try {
+            if(!taxiBookingList.isEmpty()){
+                taxiBooking=taxiBookingList.get(taxiBookingList.size()-1);
+            }
+
+        }  catch (ResponseStatusException e) {
+            return new ResponseEntity<>(messageSource.getMessage("taxiBooking.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
 
         return new ResponseEntity<> (taxiBooking, HttpStatus.OK);
 
@@ -126,4 +146,5 @@ var taxiBooking = taxiBookingService.findTaxiBookingById(id);
                 .taxiVehicleTypeId(taxiBooking.getVehicleType().getId()).build();
         return ResponseEntity.ok(taxiBookingToReturn);
     }
+
 }

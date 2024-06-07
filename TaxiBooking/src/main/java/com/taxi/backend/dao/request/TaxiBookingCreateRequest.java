@@ -17,4 +17,5 @@ public class TaxiBookingCreateRequest {
     private String city;
     private Integer customerId;
     private String vehicleType;
+    private Integer amount;
 }

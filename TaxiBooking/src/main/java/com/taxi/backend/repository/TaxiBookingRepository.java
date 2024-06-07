@@ -19,8 +19,9 @@ public interface TaxiBookingRepository extends JpaRepository<TaxiBooking, Intege
     Integer sumAllRatingByDriver_Id(@Param("id") Integer id, @Param("status") TaxiBookingStatus status);
     @Query("SELECT COUNT(t.rating) FROM TaxiBooking t WHERE t.driver.id = :id AND t.taxibookingStatus = :status")
     Integer countAllRatingByDriver_Id(@Param("id") Integer id, @Param("status") TaxiBookingStatus status);
-
-
+    @Query("SELECT r from TaxiBooking r WHERE r.driver.id=:id and (r.taxibookingStatus=:status1 or r.taxibookingStatus=:status2 or r.taxibookingStatus=:status3 )")
+    List<TaxiBooking> findStatusTaxiBookingByDriverid(@Param("id") Integer id, @Param("status1") TaxiBookingStatus status1, @Param("status2") TaxiBookingStatus status2, @Param("status3") TaxiBookingStatus status3);
+    List<TaxiBooking> findAllByDriver_IdAndTaxibookingStatus(Integer Driver_Id, TaxiBookingStatus taxiBookingStatus);
 
     List<TaxiBooking> findAllByCustomer_IdAndTaxibookingStatus(Integer Customer_Id, TaxiBookingStatus taxiBookingStatus);
     @Query("SELECT r from TaxiBooking r WHERE r.customer.id=:id and (r.taxibookingStatus=:status1 or r.taxibookingStatus=:status2 or r.taxibookingStatus=:status3 )")

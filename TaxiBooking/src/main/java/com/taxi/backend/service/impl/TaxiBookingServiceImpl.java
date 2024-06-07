@@ -43,7 +43,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
         var findCustom=findCustomer.get();
         Date now = new Date();
         var taxiBooking = TaxiBooking.builder().route(route).customer(findCustom).startTime(now)
-                .totalDistanceMeters(tb.getTotalDistanceMeters()).customer(findCustom).amount(10)
+                .totalDistanceMeters(tb.getTotalDistanceMeters()).customer(findCustom).amount(tb.getAmount())
                 .taxibookingStatus(TaxiBookingStatus.SCHEDULE).vehicleType(findVehicleTypeByname).city(tb.getCity()).build();
 
         return taxiBookingRepository.save(taxiBooking);
@@ -107,9 +107,6 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
       taxiBooking.setRating(taxiber.getRating());
       taxiBooking.setEndTime(new Date());
       taxiBooking.setTaxibookingStatus(TaxiBookingStatus.COMPLETED);
-      var driver =driverService.findOne(taxiBooking.getDriver().getId());
-      driver.setIsAvailable(true);
-      driverService.save(driver);
         return taxiBookingRepository.save(taxiBooking);
     }
     @Override
@@ -142,5 +139,16 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
     public List<TaxiBooking> findRideStatusTaxiBookingByCusId(Integer cusId){
         return taxiBookingRepository.findStatusTaxiBookingByid(cusId,TaxiBookingStatus.CAB_ARRIVED,TaxiBookingStatus.IN_RIDE,TaxiBookingStatus.CAB_DELIVERED);
     }
+
+    @Override
+    public List<TaxiBooking> findStatusTaxiBookingByDriverId(Integer DriverId, TaxiBookingStatus taxiBookingStatus) {
+        return taxiBookingRepository.findAllByDriver_IdAndTaxibookingStatus(DriverId, taxiBookingStatus);
+    }
+
+    @Override
+    public List<TaxiBooking> findRideStatusTaxiBookingByDriverId(Integer cusId) {
+        return taxiBookingRepository.findStatusTaxiBookingByDriverid(cusId ,TaxiBookingStatus.CAB_ARRIVED,TaxiBookingStatus.IN_RIDE,TaxiBookingStatus.CAB_DELIVERED);
+    }
+
 
 }
